@@ -1,9 +1,11 @@
 package commands;
 
 public enum TCP_commands {
-    CMD_PING("^#(ping):?"),
-    CMD_ECHO("^#(echo):?"),
-    EXIT("^#(exit):");
+    CMD_PING("^%(ping):?"),
+    CMD_ECHO("^%(echo):?"),
+    CMD_LOGIN("^%(log)?:((log)(-)(.)+)(\\s)((pass)+(-)+(.)+)+;"),
+    EXIT("^#(e|exit):");
+
 
     private final String reg;
 

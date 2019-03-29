@@ -8,8 +8,10 @@ import java.util.logging.Logger;
 import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
+import java.util.logging.Logger;
 
 public class ConnectionHandler implements Closeable{
+    private Logger log = Logger.getLogger(this.getClass().getName());
     private String Host;
     private int Port;
     private Socket Socket;
@@ -47,6 +49,11 @@ public class ConnectionHandler implements Closeable{
                 this.isClose = false;
             }
 
+        }  catch (SocketTimeoutException te){
+
+            System.out.println("Socket timeout connection");
+        } catch (UnknownHostException e) {
+            System.out.println(e);
         } catch (IOException e) {
             System.out.println(e);
         }
