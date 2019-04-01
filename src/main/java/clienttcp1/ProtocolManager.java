@@ -50,7 +50,7 @@ public class ProtocolManager {
     //StringBuffer stringBuffer = new StringBuffer("");
     //String string = null;
     public byte[] perform(String text_from_client) {
-        return CommPars(TextPars(text_from_client));
+        return parsComm3(CMD_LOGIN,CommPars(TextPars(text_from_client)));
     }
 
     private String TextPars(String text_from_client) {
@@ -118,7 +118,7 @@ public class ProtocolManager {
                     case CMD_LOGIN:
                     String[] Mass=parsComm2(text_from_client);
                     try{
-                        return serial(new Object[]{CMD_LOGIN,Mass[1],Mass[2]});//new byte[]{CMD_LOGIN};
+                        return serial(new Object[]{CMD_LOGIN,Mass[0],Mass[1]});//new byte[]{CMD_LOGIN};
 
                     }catch (IOException e){e.printStackTrace();
                     return null;}
@@ -128,6 +128,7 @@ public class ProtocolManager {
 
         return null;
     }
+
 
     public String Response(byte[] mess) {
         switch (mess[0]) {
@@ -153,13 +154,24 @@ private String parsComm1(String command) {
 
     private String[] parsComm2(String command) {
         String arguments = parsComm1(command);
-        String[] string = arguments.split("(.)-");
-        /*int i;
-        StringBuffer stringBuffer1 = new StringBuffer("");
-        String[] strings = new String[0];
-        for (i=0;i<string.length-1;i++){
-            stringBuffer1.append(string[i].split("(.)//s"));}
-        strings[1]= stringBuffer1.toString();*/
+        String[] string=arguments.split(" ");
+        String g=string[0].toString();
+        String[] strin1=g.split("-");
+        string[0]=strin1[1];
+        String d=string[1].toString();
+        String[] strin=d.split("-");
+        string[1]=strin[1];
+        System.out.println(string.length);
+        System.out.println(string[0]);
+        System.out.println(string[1]);
+        //System.out.println(string[2]);
+        return string;
+    }
+    private byte[] parsComm3(byte command, byte String1[]) {
+        byte[] string=new byte[3];
+        string[0]= command;
+        string[1]= String1[0];
+        string[2]= String1[1];
         return string;
     }
 
