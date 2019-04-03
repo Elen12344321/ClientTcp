@@ -11,6 +11,7 @@ import java.io.DataOutputStream;
 import java.util.logging.Logger;
 
 public class ConnectionHandler implements Closeable{
+
     private Logger log = Logger.getLogger(this.getClass().getName());
     private String Host;
     private int Port;
@@ -79,7 +80,7 @@ public class ConnectionHandler implements Closeable{
         Socket = null;
     }
 
-    public void OutText(String in_text){
+    public void OutText(String in_text) throws IOException {
         byte[] comand = ProtocolManager.perform(in_text);
         try {
             DataOutputStream.writeInt(comand.length);
@@ -129,7 +130,6 @@ public class ConnectionHandler implements Closeable{
     public Socket getSocket() {
         return Socket;
     }
-
 
    public String getText() {
       return responseText;

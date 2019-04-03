@@ -1,24 +1,35 @@
 package clienttcp1;
 
-public class Message {
-    final String user;
-    final String message;
-    final byte[] file;
+//import lombok.NoArgsConstructor;
 
-    public Message(String user, String message) {
-        this.user = user;
-        this.message = message;
+//@Data
+//@NoArgsConstructor
+public class Message {
+    private String login;
+    private String message;
+    private byte[] file;
+
+    public Message() {
+        this.login =
+                this.message = message;
         this.file = null;
     }
 
-    public Message(String user, String filename, byte[] content) {
-        this.user = user;
+    public Message(String login, String filename, byte[] content) {
+        this.login = login;
         this.message = filename;
         this.file = content;
     }
 
     public boolean isMessage() {
         return this.file == null;
+    }
+
+    public void setLogin(String mass) {
+    }
+
+    public String getLogin() {
+        return null;
     }
 }
 

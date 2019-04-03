@@ -2,6 +2,7 @@ package clienttcp1;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
     /*
@@ -93,7 +94,11 @@ public class TcpClient extends javax.swing.JFrame {
                     return;
                 }
                 if (ConHend.getSocket().isConnected()) {
-                    ConHend.OutText(jTextField2.getText());
+                    try {
+                        ConHend.OutText(jTextField2.getText());
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
+                    }
                     jTextArea1.append(timedata.format(new Date()) + jTextField2.getText() + "\n");
                 }
             }

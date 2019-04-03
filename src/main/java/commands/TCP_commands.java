@@ -4,7 +4,11 @@ public enum TCP_commands {
     CMD_PING("^%(ping):?"),
     CMD_ECHO("^%(echo):?"),
     CMD_LOGIN("^%(log)?:((log)(-)(.)+)(\\s)((pass)+(-)+(.)+)+;"),
-    EXIT("^#(e|exit):");
+    CMD_LIST("^%list:?"),
+    CMD_MSG("^%(msg):?"),
+    CMD_RECIVE_MSG("^#(rec):?"),
+    CMD_FILE("^#(f):?(\\s)(fn)(\\s)(.)+;"),
+        EXIT("^%(ex):?");
 
 
     private final String reg;
