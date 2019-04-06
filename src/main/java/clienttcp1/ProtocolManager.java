@@ -7,13 +7,12 @@ import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ProtocolManager {
     private static final Charset CHARSET = Charset.forName("UTF-8");
-
+    // Commands
     private static final byte CMD_PING = 1;
     private static final byte CMD_PING_RESPONSE = 2;
     private static final byte CMD_ECHO = 3;
@@ -40,21 +39,19 @@ public class ProtocolManager {
     private String comm;
     private Object command;
 
-    //StringBuffer stringBuffer = new StringBuffer("");
-    //String string = null;
     private Message message;
-
-
-    private String pathFile = "C:\\Users\\Admin\\";
+    //"C:\\Users\\Admin\\Idea\\Idea.txt";;
+    private String pathFile = "C:\\Users\\Admin\\Idea\\";
     private boolean WEcho = false;
     private boolean WList = false;
     private boolean WMsg = false;
     private boolean WFile = false;
+//////////////////////////////////////////////////////////////////////////////////////
+    public byte[] perform(String text_from_client) {
 
-    public byte[] perform(String text_from_client) throws IOException {
         return CommPars(TextPars(text_from_client));
     }
-
+//////////////////////////////////////////////////////////////////////////////////////////
     private String TextPars(String text_from_client) {
         StringBuffer stringBuffer = new StringBuffer("");
         String string = null;
@@ -82,42 +79,44 @@ public class ProtocolManager {
         System.out.println(string);
         return null;
     }
-
-    private byte[] CommPars(String text_from_client) throws IOException {
-        //Matcher object
-        Matcher matc1;
+    ///////////////////////////////////////////////////////////////////////////////////
+    private byte[] CommPars(String text_from_client) {
+        Matcher matcher;
+        /////////////////
         for (final TCP_commands comm : TCP_commands.values()) {
-            //find commands in TCP_commands
-            matc1 = Pattern.compile(comm.getReg()).matcher(text_from_client);
-            if (matc1.find()) {
+            /////////////pattern match
+            matcher = Pattern.compile(comm.getReg()).matcher(text_from_client);
+            if (matcher.find()) {
                 switch (comm) {
                     case CMD_PING:
                         return new byte[]{CMD_PING};
                     case CMD_ECHO:
-                        return rebuild(CMD_ECHO, parsComm1(text_from_client).getBytes());
+                        WEcho = true;
+                        return serial(CMD_ECHO, new String(parsComm1(text_from_client)));
                     case CMD_LOGIN:
-                        String[] Mass=parsComm2(text_from_client);
+                        String[] item = parsComm2(text_from_client);
                         message = new Message();
-                        message.setLogin(Mass[1]);
-                        return (byte[]) serial(CMD_LOGIN,new String[]{Mass[0],Mass[1]});//new byte[]{CMD_LOGIN};
+                        message.setLogin(item[1]);
+                        return serial(CMD_LOGIN, new String[]{item[1], item[2]});
                     case CMD_LIST:
-                     WList = true;
+                        WList = true;
                         return new byte[]{CMD_LIST};
                     case CMD_MSG:
-                        return serial(CMD_MSG, new String[]{message.getLogin(),parsComm1(text_from_client)});
+                        ////////////  System.out.println(message.getLogin());
+                        return serial(CMD_MSG, new String[]{message.getLogin(), parsComm1(text_from_client)});
+                    case CMD_FILE:
+                      return sendFile(text_from_client);
                     case CMD_RECIVE_MSG:
-                      WMsg = true;
+                        WMsg = true;
                         return new byte[]{CMD_RECEIVE_MSG};
-                 }
-            }
-        }
 
+                }}
+        }
         return null;
     }
-
-
-    public String Response(byte[] mess) {
-        switch (mess[0]) {
+///////////////////////////////////////////////////////////////////response from server
+    public String Response(byte[] message) {
+        switch (message[0]) {
             case CMD_PING_RESPONSE:
                 return "PING";
             case SERIALIZATION_ERROR:
@@ -145,20 +144,38 @@ public class ProtocolManager {
             case CMD_RECEIVE_MSG_EMPTY:
                 return "RECEIVE_MSG_EMPTY";
             default: {
-                return new String(mess);
-            }
-    }}
-///////////
-private String parsComm1(String command) {
-    if (isCommand) {
-        String arg = command.substring(command.indexOf(":") + 1, command.indexOf(";") - 1);
-        System.out.println(arg);
-        return arg;
-    } else return command;
-}
-
+                return new String(message);
+            }}
+    }
+//////////////////////////////////////////////////////////////////////////////File send
+     private byte[] sendFile(String comm){
+        //pars command
+        String[] str = parsComm2(comm);
+        //////
+         //path[1]-pathFile
+        Path path = Paths.get(pathFile, str[1]);
+        //file to byte
+        byte[] filebyte = null;
+        try {
+           filebyte = Files.readAllBytes(path);
+        } catch (IOException e) {
+            e.printStackTrace();
+            filebyte = null;
+        }
+        //CMD_FILE, login, path, byte array file
+        return serial(CMD_FILE, new  Object[]{message.getLogin(), str[1], filebyte});
+    }
+//////////////////////////: ;
+    private String parsComm1(String command) {
+        if (isCommand) {
+            String arg = command.substring(command.indexOf(":") + 1, command.indexOf(";"));
+            return arg;
+        } else return command;
+    }
+/////////////////////////////////////////////pars command
     private String[] parsComm2(String command) {
         String arguments = parsComm1(command);
+        String argument = parsComm1(command);
         String[] string=arguments.split(" ");
         String g=string[0].toString();
         String[] strin1=g.split("-");
@@ -172,41 +189,25 @@ private String parsComm1(String command) {
         System.out.println(string[0]);
         System.out.println(string[1]);
         //System.out.println(string[2]);
-        return string;
+       return string;
     }
     private byte[] parsComm3(byte command, byte String1[]) {
-        byte[] string=new byte[3];
-        string[0]= command;
-        string[1]= String1[0];
-        string[2]= String1[1];
-        return string;
-    }
-/*private byte[] handleMsg(ConnectionHandler connectionHandler, byte[] command) {
-		if (!this.server.isAuthenticated(connectionHandler))
-			return LOGIN_FIRST;
+           byte[] string=new byte[3];
+           string[0]= command;
+           string[1]= String1[0];
+           string[2]= String1[1];
+           return string;
+       }
 
-		String[] args = null;
-		try {
-			args = deserialize(command, 1, String[].class);
-		} catch (Exception ex) {
-			return SERIALIZATION_ERROR;
-		}
-
-		if (args.length != 2 || args[0] == null || args[1] == null)
-			return WRONG_PARAMS;
-
-		boolean succeed = this.server.sendMessage(connectionHandler, args[0], args[1]);
-
-		return succeed ? CMD_MSG_SENT : FAILED_SENDING;
-	}*/
     private byte[] rebuild(byte firstByte, byte[] byteArray) {
-        byte[] rebuild= new byte[byteArray.length + 1];
+        byte[] rebuild = new byte[byteArray.length + 1];
         rebuild[0] = firstByte;
         for (int i = 1; i < rebuild.length; i++) {
             rebuild[i] = byteArray[i - 1];
         }
         return rebuild;
     }
+
     private byte[] serial(byte command, Object object) {
         try {
             try (ByteArrayOutputStream out = new ByteArrayOutputStream();
@@ -220,23 +221,7 @@ private String parsComm1(String command) {
             return null;
         }
     }
-     /*private byte[] serial(Object object, String[] strings) throws IOException {
-        try (ByteArrayOutputStream out = new ByteArrayOutputStream();
-             ObjectOutputStream os = new ObjectOutputStream(out)) {
-            os.writeObject(object);
-            return out.toByteArray();
-        }
-    }*/
 
-     /*
-     * @SuppressWarnings("unchecked")
-	private <T> T deserialize(byte[] data, int offset, Class<T> clazz) throws ClassNotFoundException, IOException {
-		try (ByteArrayInputStream stream = new ByteArrayInputStream(data, offset, data.length - offset);
-				ObjectInputStream objectStream = new ObjectInputStream(stream)) {
-			return (T) objectStream.readObject();
-		}
-	}
-     * */
     @SuppressWarnings("unchecked")
     private <T> T deserialize(byte[] data, int offset, Class<T> clazz){
         try {
@@ -252,73 +237,4 @@ private String parsComm1(String command) {
             return null;
         }
     }
-/*private byte[] handleList(ConnectionHandler connectionHandler) {
-		if (!this.server.isAuthenticated(connectionHandler))
-			return LOGIN_FIRST;
-
-		try {
-			return serialize(this.server.getUsers());
-		} catch (Exception ex) {
-			return SERVER_ERROR;
-		}
-	}
-*/
-////
-private String parsResp(byte[] resp) {
-
-    System.out.println(Byte.toUnsignedInt(resp[0]));
-    //Echo response
-    if(WEcho){
-        WEcho = false;
-        return new String(resp);
-        //
-    } else if (WList || WMsg) {
-        WList = false;
-        WMsg = false;
-        StringBuffer stringBuffer = new StringBuffer();
-        String[] listName = null;
-        listName = deserialize(resp, 0, String[].class);
-        for (String s : listName) {
-            stringBuffer.append(s);
-        }
-        return stringBuffer.toString();
-    }
-    else if (WFile) {
-         WFile = false;
-         return null;
-    } else return null;
 }
-
-
-
-//
-/*
-private byte handleLogin(ConnectionHandler connection, byte command) throws IOException {
-
-    String params = null;
-    try {
-        params = deserialize(command, 1, String[].class);
-    } catch (Exception ex) {
-        return SERIALIZATION_ERROR;
-    }
-
-    if (params.length != 2 || params[0] == null || params[1] == null)
-        return WRONG_PARAMS;
-
-    boolean userExists = this.server.userExists(params[0]);
-
-    boolean success = this.server.login(params[0], params[1], connection);
-
-    if (success) {
-        if (userExists)
-            return CMD_LOGIN_OK;
-        else
-            return CMD_LOGIN_OK_NEW;
-    } else
-        return LOGIN_WRONG_PASSWORD;
-
-}*/
-    /////
-
-}
-

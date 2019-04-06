@@ -5,9 +5,9 @@ public enum TCP_commands {
     CMD_ECHO("^%(echo):?"),
     CMD_LOGIN("^%(log)?:((log)(-)(.)+)(\\s)((pass)+(-)+(.)+)+;"),
     CMD_LIST("^%list:?"),
-    CMD_MSG("^%(msg):?"),
-    CMD_RECIVE_MSG("^#(rec):?"),
-    CMD_FILE("^#(f):?(\\s)(fn)(\\s)(.)+;"),
+    CMD_MSG("^%(msg):?\\s((log)(-)(.)+)\\s((m)(-)(.)+)+;"),
+    CMD_RECIVE_MSG("^%(rec):?"),
+    CMD_FILE("^%(file):?\\s(file)(-)(.)+;"),
         EXIT("^%(ex):?");
 
 

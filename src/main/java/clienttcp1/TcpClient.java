@@ -136,7 +136,7 @@ public class TcpClient extends javax.swing.JFrame {
         jTextArea1.setColumns(10);
         jTextArea1.setRows(10);
         jScrollPane1.setViewportView(jTextArea1);
-        jTextField2.setText("Wrire message");
+        jTextField2.setText("%log:log-lllm pass-pppp;");
         jButton3.setText("SEND");
         jTextField1.setText("localhost");
         jLabel1.setText("IP");

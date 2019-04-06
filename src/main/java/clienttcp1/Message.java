@@ -1,9 +1,5 @@
 package clienttcp1;
 
-//import lombok.NoArgsConstructor;
-
-//@Data
-//@NoArgsConstructor
 public class Message {
     private String login;
     private String message;
@@ -26,10 +22,11 @@ public class Message {
     }
 
     public void setLogin(String mass) {
+        this.login = mass;
     }
 
     public String getLogin() {
-        return null;
+        return login;
     }
 }
 
