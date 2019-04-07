@@ -8,6 +8,7 @@ public enum TCP_commands {
     CMD_MSG("^%(msg):?\\s((log)(-)(.)+)\\s((m)(-)(.)+)+;"),
     CMD_RECIVE_MSG("^%(rec):?"),
     CMD_FILE("^%(file):?\\s(file)(-)(.)+;"),
+    CMD_RECIVE_FILE("^%(recf):?"),
         EXIT("^%(ex):?");
 
 

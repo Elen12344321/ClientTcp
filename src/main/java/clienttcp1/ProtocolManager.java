@@ -52,6 +52,22 @@ public class ProtocolManager {
         return CommPars(TextPars(text_from_client));
     }
 //////////////////////////////////////////////////////////////////////////////////////////
+    /*
+    *  File CP_file = new File("C:/Users");
+    int count = fr.fileSizeInLines(CP_file);
+    System.out.println("Total number of lines in the file are: "+count);
+
+    List<String> lines = fr.strReader(CP_file);
+    File FileList = new File("C:/Users");
+Scanner scan = new Scanner(FileList);
+String TheName = idToFile(Integer.toString(result));
+
+File myImageFile = new File("C:/Users" + TheName);
+sendResponse("#OK");
+sendResponse(TheName);
+sendResponse(Long.toString(myImageFile.length()));
+    * */
+    /////////////////////////////////
     private String TextPars(String text_from_client) {
         StringBuffer stringBuffer = new StringBuffer("");
         String string = null;
@@ -76,7 +92,6 @@ public class ProtocolManager {
         } else {
             return text_from_client;
         }
-        System.out.println(string);
         return null;
     }
     ///////////////////////////////////////////////////////////////////////////////////
@@ -103,12 +118,20 @@ public class ProtocolManager {
                         return new byte[]{CMD_LIST};
                     case CMD_MSG:
                         ////////////  System.out.println(message.getLogin());
-                        return serial(CMD_MSG, new String[]{message.getLogin(), parsComm1(text_from_client)});
+                        return serial(CMD_MSG, new String[]{
+                                message.getLogin(), parsComm1(text_from_client)});
                     case CMD_FILE:
                       return sendFile(text_from_client);
                     case CMD_RECIVE_MSG:
                         WMsg = true;
-                        return new byte[]{CMD_RECEIVE_MSG};
+                        return new byte[]{
+                                CMD_RECEIVE_MSG
+                        };
+                    case CMD_RECIVE_FILE:
+                        WFile = true;
+                        return new byte[]{
+                                CMD_RECEIVE_FILE
+                        };
 
                 }}
         }
@@ -177,19 +200,20 @@ public class ProtocolManager {
         String arguments = parsComm1(command);
         String argument = parsComm1(command);
         String[] string=arguments.split(" ");
-        String g=string[0].toString();
-        String[] strin1=g.split("-");
-        string[0]=strin1[1];
-        String d=string[1].toString();
-        String[] strin=d.split("-");
-        string[1]=strin[1];
+        String[] string2=arguments.split("(.)-");
+       // String g=string[0].toString();
+        //String[] strin1=g.split("-");
+        //string[0]=strin1[1];
+        //String d=string[1].toString();
+        //String[] strin=d.split("-");
+        //string[1]=strin[1];
         //string[2]=string[1];
         //string[1]=string[0];
         System.out.println(string.length);
         System.out.println(string[0]);
         System.out.println(string[1]);
         //System.out.println(string[2]);
-       return string;
+       return string2;
     }
     private byte[] parsComm3(byte command, byte String1[]) {
            byte[] string=new byte[3];
@@ -237,4 +261,8 @@ public class ProtocolManager {
             return null;
         }
     }
+    ////////////////////////////////////
+
+
+
 }
