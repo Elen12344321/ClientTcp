@@ -1,6 +1,7 @@
 package client;
 
 import commands.TCP_commands;
+import lpi.server.rmi.IServer;
 
 import java.io.*;
 import java.nio.charset.Charset;
@@ -38,6 +39,7 @@ public class ProtocolManager {
     private boolean isCommand = false;
     private String comm;
     private Object command;
+    private IServer server;
 
     // private Message message;
     //"C:\\Users\\Admin\\Idea\\Idea.txt";;

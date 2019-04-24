@@ -42,7 +42,7 @@ public class RmiClient extends javax.swing.JFrame {
         clientSocket.close();*/
     public RmiClient() {
         //title
-        super("ClientTCP");
+        super("ClientRmi");
         initComponents();
         ConHend = new ConnectionHandler("localhost", 4321);
         //connect button
