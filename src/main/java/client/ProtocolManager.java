@@ -12,7 +12,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class ProtocolManager {
-    private static final Charset CHARSET = Charset.forName("UTF-8");
     // Commands
     private static final byte CMD_PING = 1;
     private static final byte CMD_PING_RESPONSE = 2;

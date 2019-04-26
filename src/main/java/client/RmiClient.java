@@ -65,7 +65,6 @@ public class RmiClient extends javax.swing.JFrame {
                     } else {
                         jTextArea1.append(timedata.format(new Date()) + "Connect error!\n");
                         ConHend.close(true);
-                        // return;
                     }
                 }
             }
@@ -76,7 +75,6 @@ public class RmiClient extends javax.swing.JFrame {
             public void actionPerformed(ActionEvent e) {
                 if (ConHend.getSocket() != null) {
                     ConHend.close(true);
-                    //interrupt
                     thread.interrupt();
                     if (ConHend.getSocket() == null) {
                         jTextArea1.append(timedata.format(new Date()) + "Disconnected!\n");

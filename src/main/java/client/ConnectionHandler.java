@@ -3,7 +3,6 @@ package client;
 
 import java.io.IOException;
 import java.net.*;
-import java.util.logging.Logger;
 import java.io.Closeable;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
@@ -89,8 +88,7 @@ public class ConnectionHandler implements Closeable{
     }
 
     public String InText(){
-        //lamda
-        InText = new Thread(()->{
+      InText = new Thread(()->{
             while (Socket.isConnected()){
                 try {
                     int contentSize = DataInputStream.readInt();
