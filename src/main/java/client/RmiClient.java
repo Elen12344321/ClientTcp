@@ -3,6 +3,7 @@ package client;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 /*
@@ -24,8 +25,10 @@ try {
 public class RmiClient extends javax.swing.JFrame {
     private Date data;
     private SimpleDateFormat timedata = new SimpleDateFormat("hh:mm:ss    ");
-    private ConnectionHandler ConHend;
-    private ProtocolManager ProtMan;
+    //private ConnectionHandler ConHend;
+   // private ProtocolManager ProtMan;
+
+
     private Thread thread;
     /*
          String sentence;
@@ -40,45 +43,51 @@ public class RmiClient extends javax.swing.JFrame {
         modifiedSentence = inFromServer.readLine();
         //System.out.println("FROM SERVER: " + modifiedSentence);
         clientSocket.close();*/
+    private ConnectionHendlerRmi ConnRMI;
+    private ProtocolManager protocolmanager = new ProtocolManager();
+
     public RmiClient() {
         //title
         super("ClientRmi");
         initComponents();
-        ConHend = new ConnectionHandler("localhost", 4321);
+        //setResizable(false);
+        ConnRMI = new ConnectionHendlerRmi("localhost", 4321);
         //connect button
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm  ");
+//////////////////////////////////////////////////////////////////////////////////////////////////////////
         jButton1.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //host
-                ConHend.InHost(jTextField1.getText());
+                ConnRMI.Host(jTextField1.getText());
                 //port
-                ConHend.InPort(Integer.parseInt(jTextField3.getText()));
-                if (ConHend.getSocket() == null) {
-                    ConHend.SocketConnect();
-                    //if connect to server done
-                    if (ConHend.getSocket().isConnected()) {
-                        ConHend.InText();
-                        // response
+                ConnRMI.Port(Integer.parseInt(jTextField3.getText()));
+                 //registry
+                 if (ConnRMI.rregistry() == null) {
+                    if (ConnRMI.regClient()) {
                         Listener();
-                        jTextArea1.append(timedata.format(new Date()) + "Connect!\n");
-                        //error
+                        jTextArea1.append(simpleDateFormat.format(new Date()) + "Connect \n");
                     } else {
-                        jTextArea1.append(timedata.format(new Date()) + "Connect error!\n");
-                        ConHend.close(true);
+                        jTextArea1.append(simpleDateFormat.format(new Date()) + "Connect error\n");
                     }
+                } else {
+                    jTextArea1.append(simpleDateFormat.format(new Date()));
+                    return;
                 }
             }
         });
         //disconnect button
         jButton2.addActionListener(new ActionListener() {
             @Override
+            //close
             public void actionPerformed(ActionEvent e) {
-                if (ConHend.getSocket() != null) {
-                    ConHend.close(true);
-                    thread.interrupt();
-                    if (ConHend.getSocket() == null) {
-                        jTextArea1.append(timedata.format(new Date()) + "Disconnected!\n");
+                if (ConnRMI.rregistry() != null && ConnRMI.ident() != null) {
+                    try {
+                        ConnRMI.close();
+                    } catch (IOException e1) {
+                        e1.printStackTrace();
                     }
+                    jTextArea1.append(simpleDateFormat.format(new Date()) + "Disconnect!\n");
                 }
             }
         });
@@ -86,18 +95,18 @@ public class RmiClient extends javax.swing.JFrame {
         jButton3.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                // send messages
-                if (ConHend.getSocket() == null) {
-                    jTextArea1.append(timedata.format(new Date()) + "Connection error" + "\n");
-                    return;
+                               if (ConnRMI.rregistry() == null) {
+                    jTextArea1.append(simpleDateFormat.format(new Date()) + "Connection wrong" + "\n");
+                   // return;
                 }
-                if (ConHend.getSocket().isConnected()) {
+                if (ConnRMI.rregistry() != null) {
                     try {
-                        ConHend.OutText(jTextField2.getText());
-                    } catch (IOException e1) {
+                        ConnRMI.perform(jTextField2.getText());
+                    } catch (RemoteException e1) {
                         e1.printStackTrace();
                     }
-                    jTextArea1.append(timedata.format(new Date()) + jTextField2.getText() + "\n");
+
+                    jTextArea1.append(simpleDateFormat.format(new Date()) + jTextField2.getText() + "\n");
                 }
             }
         });
@@ -105,10 +114,15 @@ public class RmiClient extends javax.swing.JFrame {
     //
     private void  Listener() {
         thread = new Thread(() -> {
-            while (ConHend.getSocket().isConnected()) {
-                if (ConHend.getText() != null) {
-                    jTextArea1.append(timedata.format(new Date()) + ConHend.getText() + "\n");
-                    ConHend.setText(null);
+            while (ConnRMI.rregistry() != null) {
+                try {
+                    Thread.sleep(100);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }//response
+                if (ConnRMI.inText() != null && !ConnRMI.inText().equals("")) {
+                    jTextArea1.append(timedata.format(new Date()) + ConnRMI.inText() + "\n");
+                    ConnRMI.outText(null);
                 }
             }
         });

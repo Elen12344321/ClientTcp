@@ -4,7 +4,6 @@ import commands.TCP_commands;
 import lpi.server.rmi.IServer;
 
 import java.io.*;
-import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -69,7 +68,7 @@ sendResponse(TheName);
 sendResponse(Long.toString(myImageFile.length()));
     * */
     /////////////////////////////////
-    private String TextPars(String text_from_client) {
+    public String TextPars(String text_from_client) {
         StringBuffer stringBuffer = new StringBuffer("");
         String string = null;
 
@@ -191,7 +190,7 @@ sendResponse(Long.toString(myImageFile.length()));
         return serial(CMD_FILE, new  Object[]{message.getLogin(), str[1], filebyte});
     }
     //////////////////////////: ;
-    private String parsComm1(String command) {
+    public String parsComm1(String command) {
         if (isCommand) {
             String arg = command.substring(command.indexOf(":") + 1, command.indexOf(";"));
             return arg;
