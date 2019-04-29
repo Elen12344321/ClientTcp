@@ -201,7 +201,7 @@ sendResponse(Long.toString(myImageFile.length()));
         String arguments = parsComm1(command);
         String argument = parsComm1(command);
         String[] string=arguments.split(" ");
-        String[] string2=arguments.split("(.)-");
+        String[] string2=arguments.split("(\\w)-");
         // String g=string[0].toString();
         //String[] strin1=g.split("-");
         //string[0]=strin1[1];

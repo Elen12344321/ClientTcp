@@ -6,22 +6,7 @@ import java.io.IOException;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-/*
-try {
-            clientSocket = new Socket("localhost", 4321);
-            outputStream = clientSocket.getOutputStream();
-            dataOutputStream = new DataOutputStream(outputStream);
-            inputStream = clientSocket.getInputStream();
-*/
-    /*
-                dataOutputStream.writeUTF("Hello");
-                System.out.println("Client to server says: Hello");
 
-
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-    */
 public class RmiClient extends javax.swing.JFrame {
     private Date data;
     private SimpleDateFormat timedata = new SimpleDateFormat("hh:mm ");
@@ -30,19 +15,7 @@ public class RmiClient extends javax.swing.JFrame {
 
 
     private Thread thread;
-    /*
-         String sentence;
-         String modifiedSentence;
-         BufferedReader inFromUser = new BufferedReader(new InputStreamReader(System.in));
-        // Socket clientSocket = new Socket("localhost", 4321);
-         DataOutputStream outToServer = new DataOutputStream(clientSocket.getOutputStream());
-         BufferedReader inFromServer = new BufferedReader(new InputStreamReader(clientSocket.getInputStream()));
-         sentence = inFromUser.readLine();*/
-   /*
-        outToServer.writeBytes(sentence + 'n');
-        modifiedSentence = inFromServer.readLine();
-        //System.out.println("FROM SERVER: " + modifiedSentence);
-        clientSocket.close();*/
+
     private ConnectionHendlerRmi ConnRMI;
     private ProtocolManager protocolmanager = new ProtocolManager();
 

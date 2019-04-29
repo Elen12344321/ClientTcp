@@ -30,26 +30,7 @@ public class ConnectionHendlerRmi implements Closeable{
         this.Host = Host;
     }
     /////////////////////////
-    public void Host(String text) {
-    }
 
-    public void Port(int parseInt) {
-    }
-
-    public  Registry rregistry() {
-        return rgs;
-    }
-
-    public Object ident() {
-        return null;
-    }
-
-    public String inText() { return string; }
-
-    public void outText(String string) {
-        this.string=string;
-    }
-    private boolean bool = false;
     public void perform(String textFromLabel) throws RemoteException {
         CommPars_1(protocolManager.TextPars(textFromLabel));
     }
@@ -63,8 +44,7 @@ public class ConnectionHendlerRmi implements Closeable{
             if (matcher.find()) {
                 switch (comm) {
                     case CMD_PING:
-                     //   return new byte[]{CMD_PING};
-                       server.ping();
+                        server.ping();
                         bool = true; break;
                     case CMD_ECHO:
                         //resp
@@ -72,17 +52,12 @@ public class ConnectionHendlerRmi implements Closeable{
                         bool = true;
                         break;
                     case CMD_LOGIN:
-                        //String[] item = parsComm2(text_from_client);
-                        //message = new Message();
-                        //message.setLogin(item[1]);
-                        //return serial(CMD_LOGIN, new String[]{item[1], item[2]});
-                        //String[] mass = serial(CMD_LOGIN, new String[]{item[1], item[2]});
-                           String[] mass = protocolManager.parsComm2(text_from_client);
+                        String[] mass = protocolManager.parsComm2(text_from_client);
                             //log-1 pass-2
                             ident = server.login(mass[1], mass[2]);
                             ///////////////////////
                             string = new String("log ok");
-                         //   resiveInfoChecker();
+
 
                         bool=true;
                     case CMD_LIST:
@@ -90,24 +65,17 @@ public class ConnectionHendlerRmi implements Closeable{
                         string = new String("list:" + Str(server.listUsers(ident)));
                          bool = true;
                         break;
-                        //WList = true;
-                        //return new byte[]{CMD_LIST};
+
 
                     case CMD_MSG:
-                        ////////////  System.out.println(message.getLogin());
-                        //return serial(CMD_MSG, new String[]{
-                          //      message.getLogin(), parsComm1(text_from_client)});
+
+
                     case CMD_FILE:
-                        //return sendFile(text_from_client);
+
                     case CMD_RECIVE_MSG:
-                        //WMsg = true;
-                        //return new byte[]{
-                          //      CMD_RECEIVE_MSG
-                        //};
+
                     case CMD_RECIVE_FILE:
-                        //WFile = true;
-                        //return new byte[]{
-                          //      CMD_RECEIVE_FILE
+
                         };
 
                 }}
@@ -159,6 +127,24 @@ public class ConnectionHendlerRmi implements Closeable{
                  }
     }
 
+    public void Host(String text) {
+    }
 
+    public void Port(int parseInt) {
+    }
 
+    public  Registry rregistry() {
+        return rgs;
+    }
+
+    public Object ident() {
+        return null;
+    }
+
+    public String inText() { return string; }
+
+    public void outText(String string) {
+        this.string=string;
+    }
+    private boolean bool = false;
 }
