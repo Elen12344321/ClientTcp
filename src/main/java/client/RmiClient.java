@@ -24,7 +24,7 @@ try {
     */
 public class RmiClient extends javax.swing.JFrame {
     private Date data;
-    private SimpleDateFormat timedata = new SimpleDateFormat("hh:mm:ss    ");
+    private SimpleDateFormat timedata = new SimpleDateFormat("hh:mm ");
     //private ConnectionHandler ConHend;
    // private ProtocolManager ProtMan;
 

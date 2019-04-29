@@ -4,7 +4,12 @@ import commands.TCP_commands;
 import lpi.server.rmi.IServer;
 
 import java.io.Closeable;
+import java.io.File;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardOpenOption;
 import java.rmi.AccessException;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
@@ -19,7 +24,6 @@ public class ConnectionHendlerRmi implements Closeable{
     private int Port;
     private String Host;
     private ProtocolManager protocolManager = new ProtocolManager();
-
 
     public ConnectionHendlerRmi(String Host, int Port) {
         this.Port = Port;
@@ -61,7 +65,7 @@ public class ConnectionHendlerRmi implements Closeable{
                     case CMD_PING:
                      //   return new byte[]{CMD_PING};
                        server.ping();
-                        bool = true;break;
+                        bool = true; break;
                     case CMD_ECHO:
                         //resp
                         string = new String(server.echo(new String(protocolManager.parsComm1(text_from_client))));
@@ -72,9 +76,23 @@ public class ConnectionHendlerRmi implements Closeable{
                         //message = new Message();
                         //message.setLogin(item[1]);
                         //return serial(CMD_LOGIN, new String[]{item[1], item[2]});
+                        //String[] mass = serial(CMD_LOGIN, new String[]{item[1], item[2]});
+                           String[] mass = protocolManager.parsComm2(text_from_client);
+                            //log-1 pass-2
+                            ident = server.login(mass[1], mass[2]);
+                            ///////////////////////
+                            string = new String("log ok");
+                         //   resiveInfoChecker();
+
+                        bool=true;
                     case CMD_LIST:
+                        //identification
+                        string = new String("list:" + Str(server.listUsers(ident)));
+                         bool = true;
+                        break;
                         //WList = true;
                         //return new byte[]{CMD_LIST};
+
                     case CMD_MSG:
                         ////////////  System.out.println(message.getLogin());
                         //return serial(CMD_MSG, new String[]{
@@ -94,9 +112,20 @@ public class ConnectionHendlerRmi implements Closeable{
 
                 }}
         //}
-        //return null;
-    }
+            }
     ////////////////////////////
+    private String Str(String[] string1) {
+        StringBuffer string2 = new StringBuffer();
+        //for (int i=0;i<string1.length-1;i++) {
+        //  string2.append(string1 + "");}
+           for (String string3: string1) {
+                         string2.append(string3 + "");
+             }
+        return string2.toString();
+    }
+
+
+    ///////////////////////////////
     public boolean regClient() {
         try {
             //create object registry
@@ -112,6 +141,7 @@ public class ConnectionHendlerRmi implements Closeable{
             return false; }
     }
     //////////////////////////
+
     private String string;
     String ident;
     @Override

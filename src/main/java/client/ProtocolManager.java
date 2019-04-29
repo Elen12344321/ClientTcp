@@ -197,7 +197,7 @@ sendResponse(Long.toString(myImageFile.length()));
         } else return command;
     }
     /////////////////////////////////////////////pars command
-    private String[] parsComm2(String command) {
+    public String[] parsComm2(String command) {
         String arguments = parsComm1(command);
         String argument = parsComm1(command);
         String[] string=arguments.split(" ");
