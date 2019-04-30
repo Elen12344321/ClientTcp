@@ -18,6 +18,7 @@ import java.rmi.registry.Registry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+
 public class ConnectionHendlerRmi implements Closeable{
     private Registry rgs;
     private IServer server;
@@ -31,64 +32,87 @@ public class ConnectionHendlerRmi implements Closeable{
     }
     /////////////////////////
 
-    public void perform(String textFromLabel) throws RemoteException {
+    public void perform(String textFromLabel) throws IOException {
         CommPars_1(protocolManager.TextPars(textFromLabel));
     }
-
-    private void CommPars_1(String text_from_client) throws RemoteException {
+    private String pathFile = "C:\\Users\\Admin\\Idea\\";
+    private void CommPars_1(String text_from_client) throws IOException {
         Matcher matcher;
         /////////////////
         for (final TCP_commands comm : TCP_commands.values()) {
             /////////////pattern match
             matcher = Pattern.compile(comm.getReg()).matcher(text_from_client);
             if (matcher.find()) {
-                switch (comm) {
-                    case CMD_PING:
-                        server.ping();
-                        bool = true; break;
-                    case CMD_ECHO:
-                        //resp
-                        string = new String(server.echo(new String(protocolManager.parsComm1(text_from_client))));
-                        bool = true;
-                        break;
-                    case CMD_LOGIN:
-                        String[] mass = protocolManager.parsComm2(text_from_client);
-                            //log-1 pass-2
-                            ident = server.login(mass[1], mass[2]);
-                            ///////////////////////
+                try {
+                    switch (comm) {
+                        case CMD_PING:
+                            server.ping();
+                            bool = true;
+                            break;
+                        case CMD_ECHO:
+                            //resp
+                            string = new String(server.echo(new String(protocolManager.parsComm1(text_from_client))));
+                            bool = true;
+                            break;
+                        case CMD_LOGIN:
+                            String[] mass = protocolManager.parsComm2(text_from_client);
+                            String[] mass1 = protocolManager.parsComm3(mass[1].toString());
+                                //log-1 pass-2
+
+                            ident = server.login(mass1[0], mass[2]);
+                            System.out.println(mass[1].toString());
+                            System.out.println(mass[2].toString());
+                            System.out.println(mass1[0].toString());
+                               ///////////////////////
                             string = new String("log ok");
+                            bool = true;
+                            break;
+                        case CMD_LIST:
+                            //identification
+                            string = new String("list:" +" "+ Str(server.listUsers(ident)));
+                            bool = true;
+                            break;
+
+                        case CMD_MSG:
+                            String[] itemForMsg = protocolManager.parsComm2(text_from_client);
+                            server.sendMessage(ident, new IServer.Message(itemForMsg[1], itemForMsg[2]));
+                            string = new String("Ok! send message");
+                            bool = true;
+                            break;
+                        case CMD_FILE:
+                            String[] namefile = protocolManager.parsComm2(text_from_client);
+                            Path pathFile1 = Paths.get(namefile[2]);
+                            System.out.println(namefile[2].toString());
+                            //add name file
+                            String Path=pathFile+pathFile1.toString();
+                            //create file
+                            File file = new File(Path);
+                            System.out.println(Path);
+                            server.sendFile(ident, new IServer.FileInfo(namefile[1].toString(), file));
+                            string= new String("Ok!  send file with name"+" "+pathFile1.toString());
+                            bool = true;
+                            break;
 
 
-                        bool=true;
-                    case CMD_LIST:
-                        //identification
-                        string = new String("list:" + Str(server.listUsers(ident)));
-                         bool = true;
-                        break;
-
-
-                    case CMD_MSG:
-
-
-                    case CMD_FILE:
-
-                    case CMD_RECIVE_MSG:
-
-                    case CMD_RECIVE_FILE:
-
-                        };
-
-                }}
-        //}
+                        case EXIT:
+                           break;
+                    }
+                } catch (RemoteException e) {
+                    e.printStackTrace();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
+        } bool = false;
+    }
     ////////////////////////////
     private String Str(String[] string1) {
         StringBuffer string2 = new StringBuffer();
         //for (int i=0;i<string1.length-1;i++) {
         //  string2.append(string1 + "");}
-           for (String string3: string1) {
-                         string2.append(string3 + "");
-             }
+        for (String string3: string1) {
+            string2.append(string3 + "");
+        }
         return string2.toString();
     }
 
@@ -102,9 +126,9 @@ public class ConnectionHendlerRmi implements Closeable{
             this.server = (IServer) rgs.lookup("lpi.server.rmi");
             return true;
         } catch (NotBoundException | RemoteException e) {
-               e.printStackTrace();
-                this.rgs = null;
-                 this.server = null;
+            e.printStackTrace();
+            this.rgs = null;
+            this.server = null;
             ident = null;
             return false; }
     }
@@ -113,18 +137,19 @@ public class ConnectionHendlerRmi implements Closeable{
     private String string;
     String ident;
     @Override
+
     public void close() throws IOException {
         if (this.rgs != null) {
             try {
-                if (ident != null) {
+                    if (ident != null) {
                     server.exit(ident);
                     ident = null;
                 } } catch (AccessException e) {
-                     e.printStackTrace();
-                    } catch (RemoteException e) {
-                           e.printStackTrace();
-                       }
-                 }
+                e.printStackTrace();
+            } catch (RemoteException e) {
+                e.printStackTrace();
+            }
+        }
     }
 
     public void Host(String text) {
@@ -147,4 +172,5 @@ public class ConnectionHendlerRmi implements Closeable{
         this.string=string;
     }
     private boolean bool = false;
+
 }

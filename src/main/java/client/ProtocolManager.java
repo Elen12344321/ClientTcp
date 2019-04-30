@@ -123,16 +123,7 @@ sendResponse(Long.toString(myImageFile.length()));
                                 message.getLogin(), parsComm1(text_from_client)});
                     case CMD_FILE:
                         return sendFile(text_from_client);
-                    case CMD_RECIVE_MSG:
-                        WMsg = true;
-                        return new byte[]{
-                                CMD_RECEIVE_MSG
-                        };
-                    case CMD_RECIVE_FILE:
-                        WFile = true;
-                        return new byte[]{
-                                CMD_RECEIVE_FILE
-                        };
+
 
                 }}
         }
@@ -216,12 +207,13 @@ sendResponse(Long.toString(myImageFile.length()));
         //System.out.println(string[2]);
         return string2;
     }
-    private byte[] parsComm3(byte command, byte String1[]) {
-        byte[] string=new byte[3];
-        string[0]= command;
-        string[1]= String1[0];
-        string[2]= String1[1];
-        return string;
+    public String[] parsComm3(String str) {
+        //byte[] string=new byte[3];
+        //string[0]= command;
+        //string[1]= String1[0];
+        //string[2]= String1[1];
+        String[] str1=str.split("(\\s)");
+        return str1;
     }
 
     private byte[] rebuild(byte firstByte, byte[] byteArray) {

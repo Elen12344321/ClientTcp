@@ -8,7 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class RmiClient extends javax.swing.JFrame {
-    private Date data;
+   // private Date data;
     private SimpleDateFormat timedata = new SimpleDateFormat("hh:mm ");
     //private ConnectionHandler ConHend;
    // private ProtocolManager ProtMan;
@@ -55,11 +55,13 @@ public class RmiClient extends javax.swing.JFrame {
             //close
             public void actionPerformed(ActionEvent e) {
                 if (ConnRMI.rregistry() != null && ConnRMI.ident() != null) {
+
                     try {
                         ConnRMI.close();
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
+
                     jTextArea1.append(simpleDateFormat.format(new Date()) + "Disconnect!\n");
                 }
             }
@@ -73,11 +75,13 @@ public class RmiClient extends javax.swing.JFrame {
                    // return;
                 }
                 if (ConnRMI.rregistry() != null) {
+
                     try {
                         ConnRMI.perform(jTextField2.getText());
-                    } catch (RemoteException e1) {
+                    } catch (IOException e1) {
                         e1.printStackTrace();
                     }
+
 
                     jTextArea1.append(simpleDateFormat.format(new Date()) + jTextField2.getText() + "\n");
                 }
