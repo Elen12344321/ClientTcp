@@ -95,6 +95,8 @@ public class ConnectionHendlerRmi implements Closeable{
 
 
                         case EXIT:
+                            close();
+                            string = new String("connect close");
                            break;
                     }
                 } catch (RemoteException e) {
