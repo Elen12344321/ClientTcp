@@ -2,10 +2,14 @@ package client;
 
 import commands.TCP_commands;
 import lpi.server.rmi.IServer;
+import myApp.soapProxy.lpi.server.soap.ChatServer;
+import myApp.soapProxy.lpi.server.soap.IChatServer;
 
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
@@ -17,16 +21,56 @@ import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
+import java.net.MalformedURLException;
+import java.net.URL;
+import javax.xml.namespace.QName;
+import javax.xml.soap.SOAPConnection;
+import javax.xml.soap.SOAPConnectionFactory;
+import javax.xml.soap.SOAPMessage;
+import javax.xml.ws.Service;
+import javax.xml.ws.WebEndpoint;
+import javax.xml.ws.WebServiceClient;
+import javax.xml.ws.WebServiceException;
+import javax.xml.ws.WebServiceFeature;
 
 public class ConnectionHendlerRmi implements Closeable{
     private Registry rgs;
-    private IServer server;
+    private IChatServer server;
     private int Port;
     private String Host;
     private ProtocolManager protocolManager = new ProtocolManager();
+    URL url = new URL("http://localhost:4321/chat?wsdl");
+    private final static QName qname = new QName("http://soap.server.lpi/", "ChatServer");
+    Service service = Service.create(url, qname);
 
-    public ConnectionHendlerRmi(String Host, int Port) {
+    ////////////////
+    private void callSoapWebService()
+    {
+        SOAPConnectionFactory soapFactory  = null;
+        SOAPConnection soapConnect  = null;
+        SOAPMessage soapRequest  = null;
+        SOAPMessage           soapResponse = null;
+        try {
+
+          //  setSoapParams();
+
+//            soapRequest  = createSOAPRequest(soapAction);
+
+
+            soapFactory = SOAPConnectionFactory.newInstance();
+            soapConnect = soapFactory.createConnection();
+
+
+            soapResponse = soapConnect.call(soapRequest, url);
+
+
+            soapConnect.close();
+        } catch (Exception e) {
+            System.err.println("Exception : " + e.getMessage());
+        }
+    }
+    ////////////////
+    public ConnectionHendlerRmi(String Host, int Port) throws MalformedURLException {
         this.Port = Port;
         this.Host = Host;
     }
@@ -59,7 +103,7 @@ public class ConnectionHendlerRmi implements Closeable{
                             String[] mass1 = protocolManager.parsComm3(mass[1].toString());
                                 //log-1 pass-2
 
-                            ident = server.login(mass1[0], mass[2]);
+                            //ident = server.login(mass1[0], mass[2]);
                             System.out.println(mass[1].toString());
                             System.out.println(mass[2].toString());
                             System.out.println(mass1[0].toString());
@@ -69,13 +113,13 @@ public class ConnectionHendlerRmi implements Closeable{
                             break;
                         case CMD_LIST:
                             //identification
-                            string = new String("list:" +" "+ Str(server.listUsers(ident)));
+                           // string = new String("list:" +" "+ Str(server.listUsers(ident)));
                             bool = true;
                             break;
 
                         case CMD_MSG:
                             String[] itemForMsg = protocolManager.parsComm2(text_from_client);
-                            server.sendMessage(ident, new IServer.Message(itemForMsg[1], itemForMsg[2]));
+                         //   server.sendMessage(ident, new IServer.Message(itemForMsg[1], itemForMsg[2]));
                             string = new String("Ok! send message");
                             bool = true;
                             break;
@@ -88,7 +132,7 @@ public class ConnectionHendlerRmi implements Closeable{
                             //create file
                             File file = new File(Path);
                             System.out.println(Path);
-                            server.sendFile(ident, new IServer.FileInfo(namefile[1].toString(), file));
+                         //   server.sendFile(ident, new IServer.FileInfo(namefile[1].toString(), file));
                             string= new String("Ok!  send file with name"+" "+pathFile1.toString());
                             bool = true;
                             break;
@@ -120,14 +164,16 @@ public class ConnectionHendlerRmi implements Closeable{
 
 
     ///////////////////////////////
+    ChatServer serverWrapper = new ChatServer( );
+    IChatServer serverProxy = serverWrapper.getChatServerProxy();
     public boolean regClient() {
         try {
             //create object registry
             this.rgs= LocateRegistry.getRegistry(Host, Port);
             ///get object
-            this.server = (IServer) rgs.lookup("lpi.server.rmi");
+            this.server = (IChatServer) serverWrapper.getChatServerProxy();;
             return true;
-        } catch (NotBoundException | RemoteException e) {
+        } catch (RemoteException e) {
             e.printStackTrace();
             this.rgs = null;
             this.server = null;
@@ -142,15 +188,10 @@ public class ConnectionHendlerRmi implements Closeable{
 
     public void close() throws IOException {
         if (this.rgs != null) {
-            try {
-                    if (ident != null) {
-                    server.exit(ident);
-                    ident = null;
-                } } catch (AccessException e) {
-                e.printStackTrace();
-            } catch (RemoteException e) {
-                e.printStackTrace();
-            }
+            if (ident != null) {
+           // server.exit(ident);
+            ident = null;
+        }
         }
     }
 

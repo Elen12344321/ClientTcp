@@ -3,6 +3,7 @@ package client;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -19,7 +20,7 @@ public class RmiClient extends javax.swing.JFrame {
     private ConnectionHendlerRmi ConnRMI;
     private ProtocolManager protocolmanager = new ProtocolManager();
 
-    public RmiClient() {
+    public RmiClient() throws MalformedURLException {
         //title
         super("ClientRmi");
         initComponents();
@@ -197,7 +198,11 @@ public class RmiClient extends javax.swing.JFrame {
 
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
-                new RmiClient().setVisible(true);
+                try {
+                    new RmiClient().setVisible(true);
+                } catch (MalformedURLException e) {
+                    e.printStackTrace();
+                }
             }
         });
     }
