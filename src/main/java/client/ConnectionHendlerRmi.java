@@ -25,27 +25,32 @@ import java.rmi.registry.Registry;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-@WebService(serviceName = "ChatServer", portName = "ChatServerProxy", endpointInterface = "lpi.server.soap.IServer")
+//@WebService(serviceName = "ChatServer", portName = "ChatServerProxy", endpointInterface = "lpi.server.soap.IServer")
 
-public class ConnectionHendlerRmi implements  Runnable, Closeable, IChatServer{
+public class ConnectionHendlerRmi implements  Runnable, Closeable{
     private Registry rgs;
     private IChatServer server;
     private int Port;
     private String Host;
     private ProtocolManager protocolManager = new ProtocolManager();
-    ChatServer serverWrapper = new ChatServer( );
-    IChatServer serverProxy = serverWrapper.getChatServerProxy();
+    ChatServer serverWrapper;
+    IChatServer serverProxy;
     URL url = new URL("http://localhost:4321/chat?wsdl");
     QName qname = new QName("http://soap.server.lpi/", "ChatServer");
     Service service;// = Service.create(url, qname);
+
     public ConnectionHendlerRmi(String Host, int Port) throws MalformedURLException {
         this.Port = Port;
         this.Host = Host;
+       // serverWrapper = new ChatServer( url, qname);
+        //serverProxy = serverWrapper.getChatServerProxy();
     }
     /////////////////////////
+    IChatServer hello;// = service.getPort(IChatServer.class);
 
-    public void perform(String textFromLabel) throws IOException {
-        CommPars_1(protocolManager.TextPars(textFromLabel));
+   /// hello=service(IChatServer.class);
+    public void perform(String text_from_client) throws IOException {
+        CommPars_1(protocolManager.TextPars(text_from_client));
     }
     private String pathFile = "C:\\Users\\Admin\\Idea\\";
     private void CommPars_1(String text_from_client) throws IOException {
@@ -133,19 +138,21 @@ public class ConnectionHendlerRmi implements  Runnable, Closeable, IChatServer{
 
     ///////////////////////////////
     public boolean regClient() {
-        try {
+        //try {
             //create object registry
-            this.rgs= LocateRegistry.getRegistry(Host, Port);
+           // this.rgs= LocateRegistry.getRegistry(Host, Port);
             ///get object
             //this.server = (IChatServer) rgs.lookup("lpi.server.rmi");
-             this.service = Service.create(url, qname);
+       this.serverWrapper = new ChatServer( url, qname);
+        this.serverProxy = serverWrapper.getChatServerProxy();
+        //this.serverProxy = (IChatServer) Service.create(url, qname);
             return true;
-        } catch (RemoteException e) {
-            e.printStackTrace();
-            this.rgs = null;
-            this.server = null;
-            ident = null;
-            return false; }
+      //  } //catch () {
+            //e.printStackTrace();
+            //this.rgs = null;
+            //this.server = null;
+            //ident = null;
+            //return false; }
     }
     //////////////////////////
 
@@ -193,48 +200,6 @@ public class ConnectionHendlerRmi implements  Runnable, Closeable, IChatServer{
 
     }
 
-    @Override
-    public void exit(String sessionId) throws ArgumentFault, ServerFault {
 
-    }
 
-    @Override
-    public void ping() {
-
-    }
-
-    @Override
-    public String echo(String text) {
-        return null;
-    }
-
-    @Override
-    public String login(String login, String password) throws ArgumentFault, LoginFault, ServerFault {
-        return null;
-    }
-
-    @Override
-    public void sendFile(String sessionId, FileInfo file) throws ArgumentFault, ServerFault {
-
-    }
-
-    @Override
-    public List<String> listUsers(String sessionId) throws ArgumentFault, ServerFault {
-        return null;
-    }
-
-    @Override
-    public void sendMessage(String sessionId, Message message) throws ArgumentFault, ServerFault {
-
-    }
-
-    @Override
-    public Message receiveMessage(String sessionId) throws ArgumentFault, ServerFault {
-        return null;
-    }
-
-    @Override
-    public FileInfo receiveFile(String sessionId) throws ArgumentFault, ServerFault {
-        return null;
-    }
 }
