@@ -11,8 +11,7 @@ import java.util.Date;
 public class RmiClient extends javax.swing.JFrame {
    // private Date data;
     private SimpleDateFormat timedata = new SimpleDateFormat("hh:mm ");
-    //private ConnectionHandler ConHend;
-   // private ProtocolManager ProtMan;
+
 
 
     private Thread thread;
@@ -22,9 +21,8 @@ public class RmiClient extends javax.swing.JFrame {
 
     public RmiClient() throws MalformedURLException {
         //title
-        super("ClientRmi");
+        super("ClientSoap");
         initComponents();
-        //setResizable(false);
         ConnRMI = new ConnectionHendlerRmi("localhost", 4321);
         //connect button
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm  ");
