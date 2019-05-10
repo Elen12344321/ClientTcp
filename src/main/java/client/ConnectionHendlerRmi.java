@@ -93,7 +93,7 @@ public class ConnectionHendlerRmi implements  Runnable, Closeable{
                             break;
                         case CMD_LIST:
                             //identification
-                            //   string = new String("list:" +" "+ Str(server.listUsers(ident)));
+                            string = new String("list:" +" "+ (serverProxy.listUsers(ident)));
                             bool = true;
                             break;
 
