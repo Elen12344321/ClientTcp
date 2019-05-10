@@ -2,8 +2,10 @@ package client;
 
 import commands.TCP_commands;
 import lpi.server.rmi.IServer;
-import myApp.soapProxy.lpi.server.soap.*;
-import myApp.soapProxy.lpi.server.soap.Message;
+import lpi.server.soap.*;
+//import myApp.soapProxy.lpi.server.soap.*;
+//import myApp.soapProxy.lpi.server.soap.Ping;
+//import myApp.soapProxy.lpi.server.soap.Message;
 
 import javax.jws.WebService;
 import javax.xml.namespace.QName;
@@ -32,6 +34,8 @@ public class ConnectionHendlerRmi implements  Runnable, Closeable{
     private IChatServer server;
     private int Port;
     private String Host;
+   // private Ping ping1;
+    //private Echo echo1;
     private ProtocolManager protocolManager = new ProtocolManager();
     ChatServer serverWrapper;
     IChatServer serverProxy;
@@ -42,8 +46,8 @@ public class ConnectionHendlerRmi implements  Runnable, Closeable{
     public ConnectionHendlerRmi(String Host, int Port) throws MalformedURLException {
         this.Port = Port;
         this.Host = Host;
-       // serverWrapper = new ChatServer( url, qname);
-        //serverProxy = serverWrapper.getChatServerProxy();
+        serverWrapper = new ChatServer( url, qname);
+       serverProxy = serverWrapper.getChatServerProxy();
     }
     /////////////////////////
     IChatServer hello;// = service.getPort(IChatServer.class);
@@ -63,63 +67,76 @@ public class ConnectionHendlerRmi implements  Runnable, Closeable{
                 try {
                     switch (comm) {
                         case CMD_PING:
-                            server.ping();
+                            //ping1;
+                            serverProxy.ping();
                             bool = true;
                             break;
                         case CMD_ECHO:
                             //resp
-                            string = new String(server.echo(new String(protocolManager.parsComm1(text_from_client))));
+                            string = new String(serverProxy.echo(new String(protocolManager.parsComm1(text_from_client))));
+                            //  string = new String(echo1.setText(new String(protocolManager.parsComm1(text_from_client)));
+                            //serverProxy.echo();
                             bool = true;
                             break;
                         case CMD_LOGIN:
                             String[] mass = protocolManager.parsComm2(text_from_client);
                             String[] mass1 = protocolManager.parsComm3(mass[1].toString());
-                                //log-1 pass-2
+                            //log-1 pass-2
 
-                           // ident = server.login(mass1[0], mass[2]);
+                            ident = serverProxy.login(mass1[0], mass[2]);
                             System.out.println(mass[1].toString());
                             System.out.println(mass[2].toString());
                             System.out.println(mass1[0].toString());
-                               ///////////////////////
+                            ///////////////////////
                             string = new String("log ok");
                             bool = true;
                             break;
                         case CMD_LIST:
                             //identification
-                         //   string = new String("list:" +" "+ Str(server.listUsers(ident)));
+                            //   string = new String("list:" +" "+ Str(server.listUsers(ident)));
                             bool = true;
                             break;
 
                         case CMD_MSG:
                             String[] itemForMsg = protocolManager.parsComm2(text_from_client);
-                          //  server.sendMessage(ident, new IServer.Message(itemForMsg[1], itemForMsg[2]));
+                            //  server.sendMessage(ident, new IServer.Message(itemForMsg[1], itemForMsg[2]));
                             string = new String("Ok! send message");
                             bool = true;
+                            break;
+                        case CMD_RECIVE_MSG:
                             break;
                         case CMD_FILE:
                             String[] namefile = protocolManager.parsComm2(text_from_client);
                             Path pathFile1 = Paths.get(namefile[2]);
                             System.out.println(namefile[2].toString());
                             //add name file
-                            String Path=pathFile+pathFile1.toString();
+                            String Path = pathFile + pathFile1.toString();
                             //create file
                             File file = new File(Path);
                             System.out.println(Path);
-                           // server.sendFile(ident, new IChatServer.FileInfo(namefile[1].toString(), file));
-                            string= new String("Ok!  send file with name"+" "+pathFile1.toString());
+                            // server.sendFile(ident, new IChatServer.FileInfo(namefile[1].toString(), file));
+                            string = new String("Ok!  send file with name" + " " + pathFile1.toString());
                             bool = true;
                             break;
 
 
+                        case CMD_RECIVE_FILE:
+                            break;
                         case EXIT:
                             close();
                             string = new String("connect close");
-                           break;
+                            break;
                     }
                 } catch (RemoteException e) {
                     e.printStackTrace();
                 } catch (IOException e) {
                     e.printStackTrace();
+                } catch (ArgumentFault argumentFault) {
+                    argumentFault.printStackTrace();
+                } catch (ServerFault serverFault) {
+                    serverFault.printStackTrace();
+                } catch (LoginFault loginFault) {
+                    loginFault.printStackTrace();
                 }
             }
         } bool = false;
@@ -143,16 +160,22 @@ public class ConnectionHendlerRmi implements  Runnable, Closeable{
            // this.rgs= LocateRegistry.getRegistry(Host, Port);
             ///get object
             //this.server = (IChatServer) rgs.lookup("lpi.server.rmi");
-       this.serverWrapper = new ChatServer( url, qname);
-        this.serverProxy = serverWrapper.getChatServerProxy();
-        //this.serverProxy = (IChatServer) Service.create(url, qname);
+        /*
+        try {
+            //create object registry
+            this.rgs= LocateRegistry.getRegistry(Host, Port);
+            ///get object
+            this.server = (IServer) rgs.lookup("lpi.server.rmi");
             return true;
-      //  } //catch () {
-            //e.printStackTrace();
-            //this.rgs = null;
-            //this.server = null;
-            //ident = null;
-            //return false; }
+        }
+        */try{
+            this.rgs= LocateRegistry.getRegistry(Host, Port);
+        this.serverWrapper = new ChatServer(url, qname);
+        this.serverProxy = serverWrapper.getChatServerProxy();
+       // this.serverProxy = (IChatServer) Service.create(url, qname);
+        return true;}
+        catch (IOException e){return false;}
+
     }
     //////////////////////////
 
