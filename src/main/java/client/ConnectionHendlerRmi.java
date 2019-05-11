@@ -3,6 +3,7 @@ package client;
 import commands.TCP_commands;
 import lpi.server.rmi.IServer;
 import lpi.server.soap.*;
+import lpi.server.soap.Message;
 //import myApp.soapProxy.lpi.server.soap.*;
 //import myApp.soapProxy.lpi.server.soap.Ping;
 //import myApp.soapProxy.lpi.server.soap.Message;
@@ -56,6 +57,7 @@ public class ConnectionHendlerRmi implements  Runnable, Closeable{
     public void perform(String text_from_client) throws IOException {
         CommPars_1(protocolManager.TextPars(text_from_client));
     }
+    private String log_send;
     private String pathFile = "C:\\Users\\Admin\\Idea\\";
     private void CommPars_1(String text_from_client) throws IOException {
         Matcher matcher;
@@ -81,40 +83,50 @@ public class ConnectionHendlerRmi implements  Runnable, Closeable{
                         case CMD_LOGIN:
                             String[] mass = protocolManager.parsComm2(text_from_client);
                             String[] mass1 = protocolManager.parsComm3(mass[1].toString());
+                            log_send = mass1[0];
                             //log-1 pass-2
-
                             ident = serverProxy.login(mass1[0], mass[2]);
-                            System.out.println(mass[1].toString());
-                            System.out.println(mass[2].toString());
-                            System.out.println(mass1[0].toString());
+                            //System.out.println(mass[1].toString());
+                            //System.out.println(mass[2].toString());
+                            //System.out.println(mass1[0].toString());
                             ///////////////////////
                             string = new String("log ok");
                             bool = true;
                             break;
                         case CMD_LIST:
                             //identification
-                            string = new String("list:" +" "+ (serverProxy.listUsers(ident)));
+                            string = new String("list:" + " " + (serverProxy.listUsers(ident)));
                             bool = true;
                             break;
 
                         case CMD_MSG:
-                            String[] itemForMsg = protocolManager.parsComm2(text_from_client);
-                            //  server.sendMessage(ident, new IServer.Message(itemForMsg[1], itemForMsg[2]));
+                            String[] Mass = protocolManager.parsComm2(text_from_client);
+                            String[] Mass1 = protocolManager.parsComm3(Mass[1].toString());
+                          //  System.out.println(Mass1[0].toString()+"1");
+                            //System.out.println(Mass1[1].toString());
+                            // String[] Str1 = new String[0];
+                            //ident=new sendMessage;
+                            serverProxy.sendMessage(ident, Setter_1(log_send, Mass1[0], Mass[2]));
                             string = new String("Ok! send message");
                             bool = true;
                             break;
-                        case CMD_RECIVE_MSG:
-                            break;
+                       // case CMD_RECIVE_MSG:
+                         //`   break;
+
                         case CMD_FILE:
                             String[] namefile = protocolManager.parsComm2(text_from_client);
-                            Path pathFile1 = Paths.get(namefile[2]);
-                            System.out.println(namefile[2].toString());
+                            String[] namefile1=protocolManager.parsComm3(namefile[2].toString());
+                            String[] namefile2=protocolManager.parsComm3(namefile[1].toString());
+                            Path pathFile1 = Paths.get(namefile1[0].toString());
+                           // System.out.println(namefile1[0].toString()+"1");
+
                             //add name file
-                            String Path = pathFile + pathFile1.toString();
+                            String Path = pathFile+pathFile1.toString();
                             //create file
                             File file = new File(Path);
                             System.out.println(Path);
-                            // server.sendFile(ident, new IChatServer.FileInfo(namefile[1].toString(), file));
+                            // log-send, log-res, file-name, path to file
+                            serverProxy.sendFile(ident, Setter_2(log_send, namefile2[0], file.getName(), Files.readAllBytes(file.toPath())));
                             string = new String("Ok!  send file with name" + " " + pathFile1.toString());
                             bool = true;
                             break;
@@ -152,7 +164,28 @@ public class ConnectionHendlerRmi implements  Runnable, Closeable{
         return string2.toString();
     }
 
+    private Message Setter_1(String str_1, String str_2, String str_3) {
+        Message mess;
+        mess= new Message();
+        //mess=Message.setSendler(str_1);
+        mess.setSender(str_1);
+        mess.setReceiver(str_2);
+        mess.setMessage(str_3);
+        return mess;
+    }
 
+
+    ////////////////////////////
+    private FileInfo Setter_2(String str1, String str2, String str3, byte[] path) {
+        FileInfo file = new FileInfo();
+        file.setSender(str1);
+        ////////////////////////////////
+        file.setReceiver(str2);
+
+        file.setFilename(str3);
+        file.setFileContent(path);
+        return file;
+    }
     ///////////////////////////////
     public boolean regClient() {
         //try {
