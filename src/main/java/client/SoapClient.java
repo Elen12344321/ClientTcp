@@ -4,11 +4,10 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class RmiClient extends javax.swing.JFrame {
+public class SoapClient extends javax.swing.JFrame {
    // private Date data;
     private SimpleDateFormat timedata = new SimpleDateFormat("hh:mm ");
 
@@ -16,14 +15,14 @@ public class RmiClient extends javax.swing.JFrame {
 
     private Thread thread;
 
-    private ConnectionHendlerRmi ConnRMI;
+    private ConnectionHendlerSoap ConnSoap;
     private ProtocolManager protocolmanager = new ProtocolManager();
 
-    public RmiClient() throws MalformedURLException {
+    public SoapClient() throws MalformedURLException {
         //title
         super("ClientSoap");
         initComponents();
-        ConnRMI = new ConnectionHendlerRmi("localhost", 4321);
+        ConnSoap = new ConnectionHendlerSoap("localhost", 4321);
         //connect button
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm  ");
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -31,12 +30,12 @@ public class RmiClient extends javax.swing.JFrame {
             @Override
             public void actionPerformed(ActionEvent e) {
                 //host
-                ConnRMI.Host(jTextField1.getText());
+                ConnSoap.Host(jTextField1.getText());
                 //port
-                ConnRMI.Port(Integer.parseInt(jTextField3.getText()));
+                ConnSoap.Port(Integer.parseInt(jTextField3.getText()));
                  //registry
-                 if (ConnRMI.rregistry() == null) {
-                    if (ConnRMI.regClient()) {
+                 if (ConnSoap.rregistry() == null) {
+                    if (ConnSoap.regClient()) {
                         Listener();
                         jTextArea1.append(simpleDateFormat.format(new Date()) + "Connect \n");
                     } else {
@@ -53,10 +52,10 @@ public class RmiClient extends javax.swing.JFrame {
             @Override
             //close
             public void actionPerformed(ActionEvent e) {
-                if (ConnRMI.rregistry() != null && ConnRMI.ident() != null) {
+                if (ConnSoap.rregistry() != null && ConnSoap.ident() != null) {
 
                     try {
-                        ConnRMI.close();
+                        ConnSoap.close();
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
@@ -69,14 +68,14 @@ public class RmiClient extends javax.swing.JFrame {
         jButton3.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                               if (ConnRMI.rregistry() == null) {
+                               if (ConnSoap.rregistry() == null) {
                     jTextArea1.append(simpleDateFormat.format(new Date()) + "Connection wrong" + "\n");
                    // return;
                 }
-                if (ConnRMI.rregistry() != null) {
+                if (ConnSoap.rregistry() != null) {
 
                     try {
-                        ConnRMI.perform(jTextField2.getText());
+                        ConnSoap.perform(jTextField2.getText());
                     } catch (IOException e1) {
                         e1.printStackTrace();
                     }
@@ -90,15 +89,15 @@ public class RmiClient extends javax.swing.JFrame {
     //
     private void  Listener() {
         thread = new Thread(() -> {
-            while (ConnRMI.rregistry() != null) {
+            while (ConnSoap.rregistry() != null) {
                 try {
                     Thread.sleep(100);
                 } catch (InterruptedException e) {
                     e.printStackTrace();
                 }//response
-                if (ConnRMI.inText() != null && !ConnRMI.inText().equals("")) {
-                    jTextArea1.append(timedata.format(new Date()) + ConnRMI.inText() + "\n");
-                    ConnRMI.outText(null);
+                if (ConnSoap.inText() != null && !ConnSoap.inText().equals("")) {
+                    jTextArea1.append(timedata.format(new Date()) + ConnSoap.inText() + "\n");
+                    ConnSoap.outText(null);
                 }
             }
         });
@@ -185,19 +184,19 @@ public class RmiClient extends javax.swing.JFrame {
                 }
             }
         } catch (ClassNotFoundException ex) {
-            java.util.logging.Logger.getLogger(RmiClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SoapClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (InstantiationException ex) {
-            java.util.logging.Logger.getLogger(RmiClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SoapClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (IllegalAccessException ex) {
-            java.util.logging.Logger.getLogger(RmiClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SoapClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         } catch (javax.swing.UnsupportedLookAndFeelException ex) {
-            java.util.logging.Logger.getLogger(RmiClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
+            java.util.logging.Logger.getLogger(SoapClient.class.getName()).log(java.util.logging.Level.SEVERE, null, ex);
         }
 
         java.awt.EventQueue.invokeLater(new Runnable() {
             public void run() {
                 try {
-                    new RmiClient().setVisible(true);
+                    new SoapClient().setVisible(true);
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
                 }

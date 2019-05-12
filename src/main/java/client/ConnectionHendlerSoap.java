@@ -30,7 +30,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 //@WebService(serviceName = "ChatServer", portName = "ChatServerProxy", endpointInterface = "lpi.server.soap.IServer")
 
-public class ConnectionHendlerRmi implements  Runnable, Closeable{
+public class ConnectionHendlerSoap implements  Runnable, Closeable{
     private Registry rgs;
     private IChatServer server;
     private int Port;
@@ -44,7 +44,7 @@ public class ConnectionHendlerRmi implements  Runnable, Closeable{
     QName qname = new QName("http://soap.server.lpi/", "ChatServer");
     Service service;// = Service.create(url, qname);
 
-    public ConnectionHendlerRmi(String Host, int Port) throws MalformedURLException {
+    public ConnectionHendlerSoap(String Host, int Port) throws MalformedURLException {
         this.Port = Port;
         this.Host = Host;
         serverWrapper = new ChatServer( url, qname);
@@ -81,25 +81,30 @@ public class ConnectionHendlerRmi implements  Runnable, Closeable{
                             bool = true;
                             break;
                         case CMD_LOGIN:
-                            String[] mass = protocolManager.parsComm2(text_from_client);
-                            String[] mass1 = protocolManager.parsComm3(mass[1].toString());
-                            log_send = mass1[0];
-                            //log-1 pass-2
-                            ident = serverProxy.login(mass1[0], mass[2]);
-                            //System.out.println(mass[1].toString());
-                            //System.out.println(mass[2].toString());
-                            //System.out.println(mass1[0].toString());
-                            ///////////////////////
-                            string = new String("log ok");
+                            if (ident == null) {
+                                String[] mass = protocolManager.parsComm2(text_from_client);
+                                String[] mass1 = protocolManager.parsComm3(mass[1].toString());
+                                log_send = mass1[0];
+                                //log-1 pass-2
+                                ident = serverProxy.login(mass1[0], mass[2]);
+                                //System.out.println(mass[1].toString());
+                                //System.out.println(mass[2].toString());
+                                //System.out.println(mass1[0].toString());
+                                ///////////////////////
+                                string = new String("log ok");
+                            }else string = new String("no log");
                             bool = true;
                             break;
                         case CMD_LIST:
+                            if (ident == null) {
                             //identification
                             string = new String("list:" + " " + (serverProxy.listUsers(ident)));
+                            }else string = new String("no log");
                             bool = true;
                             break;
 
                         case CMD_MSG:
+                            if (ident == null) {
                             String[] Mass = protocolManager.parsComm2(text_from_client);
                             String[] Mass1 = protocolManager.parsComm3(Mass[1].toString());
                           //  System.out.println(Mass1[0].toString()+"1");
@@ -108,19 +113,18 @@ public class ConnectionHendlerRmi implements  Runnable, Closeable{
                             //ident=new sendMessage;
                             serverProxy.sendMessage(ident, Setter_1(log_send, Mass1[0], Mass[2]));
                             string = new String("Ok! send message");
+                            }else string = new String("no log");
                             bool = true;
                             break;
                        // case CMD_RECIVE_MSG:
                          //`   break;
 
                         case CMD_FILE:
+                            if (ident == null) {
                             String[] namefile = protocolManager.parsComm2(text_from_client);
                             String[] namefile1=protocolManager.parsComm3(namefile[2].toString());
                             String[] namefile2=protocolManager.parsComm3(namefile[1].toString());
                             Path pathFile1 = Paths.get(namefile1[0].toString());
-                           // System.out.println(namefile1[0].toString()+"1");
-
-                            //add name file
                             String Path = pathFile+pathFile1.toString();
                             //create file
                             File file = new File(Path);
@@ -128,15 +132,17 @@ public class ConnectionHendlerRmi implements  Runnable, Closeable{
                             // log-send, log-res, file-name, path to file
                             serverProxy.sendFile(ident, Setter_2(log_send, namefile2[0], file.getName(), Files.readAllBytes(file.toPath())));
                             string = new String("Ok!  send file with name" + " " + pathFile1.toString());
+                            }else string = new String("no log");
                             bool = true;
                             break;
-
-
                         case CMD_RECIVE_FILE:
                             break;
                         case EXIT:
+                            if (ident == null) {
                             close();
                             string = new String("connect close");
+                            }else string = new String("no log");
+                            bool = true;
                             break;
                     }
                 } catch (RemoteException e) {
