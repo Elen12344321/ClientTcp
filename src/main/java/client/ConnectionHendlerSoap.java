@@ -11,6 +11,7 @@ import lpi.server.soap.Message;
 import javax.jws.WebService;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
+import javax.xml.ws.WebServiceException;
 import java.io.Closeable;
 import java.io.File;
 import java.io.IOException;
@@ -26,6 +27,8 @@ import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
 import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 //@WebService(serviceName = "ChatServer", portName = "ChatServerProxy", endpointInterface = "lpi.server.soap.IServer")
@@ -81,22 +84,19 @@ public class ConnectionHendlerSoap implements  Runnable, Closeable{
                             bool = true;
                             break;
                         case CMD_LOGIN:
-                            if (ident == null) {
+
                                 String[] mass = protocolManager.parsComm2(text_from_client);
                                 String[] mass1 = protocolManager.parsComm3(mass[1].toString());
                                 log_send = mass1[0];
                                 //log-1 pass-2
                                 ident = serverProxy.login(mass1[0], mass[2]);
-                                //System.out.println(mass[1].toString());
-                                //System.out.println(mass[2].toString());
-                                //System.out.println(mass1[0].toString());
+                                File_Rsvr();
                                 ///////////////////////
                                 string = new String("log ok");
-                            }else string = new String("no log");
-                            bool = true;
+                                bool = true;
                             break;
                         case CMD_LIST:
-                            if (ident == null) {
+                            if (ident != null) {
                             //identification
                             string = new String("list:" + " " + (serverProxy.listUsers(ident)));
                             }else string = new String("no log");
@@ -104,7 +104,7 @@ public class ConnectionHendlerSoap implements  Runnable, Closeable{
                             break;
 
                         case CMD_MSG:
-                            if (ident == null) {
+                            if (ident != null) {
                             String[] Mass = protocolManager.parsComm2(text_from_client);
                             String[] Mass1 = protocolManager.parsComm3(Mass[1].toString());
                           //  System.out.println(Mass1[0].toString()+"1");
@@ -120,7 +120,7 @@ public class ConnectionHendlerSoap implements  Runnable, Closeable{
                          //`   break;
 
                         case CMD_FILE:
-                            if (ident == null) {
+                            if (ident != null) {
                             String[] namefile = protocolManager.parsComm2(text_from_client);
                             String[] namefile1=protocolManager.parsComm3(namefile[2].toString());
                             String[] namefile2=protocolManager.parsComm3(namefile[1].toString());
@@ -131,6 +131,7 @@ public class ConnectionHendlerSoap implements  Runnable, Closeable{
                             System.out.println(Path);
                             // log-send, log-res, file-name, path to file
                             serverProxy.sendFile(ident, Setter_2(log_send, namefile2[0], file.getName(), Files.readAllBytes(file.toPath())));
+                            // File_Rsvr();
                             string = new String("Ok!  send file with name" + " " + pathFile1.toString());
                             }else string = new String("no log");
                             bool = true;
@@ -138,7 +139,7 @@ public class ConnectionHendlerSoap implements  Runnable, Closeable{
                         case CMD_RECIVE_FILE:
                             break;
                         case EXIT:
-                            if (ident == null) {
+                            if (ident != null) {
                             close();
                             string = new String("connect close");
                             }else string = new String("no log");
@@ -193,6 +194,58 @@ public class ConnectionHendlerSoap implements  Runnable, Closeable{
         return file;
     }
     ///////////////////////////////
+   public String mass;
+   private String mass_1;
+
+  //Timer time1,timer;
+    private void File_Rsvr () {
+        //private class File_Rsvr exstends TimeTask{
+      //  TimerTask time2 = null;
+        Timer time1;
+        time1= new Timer();
+        TimerTask timer;
+        timer= new TimerTask() {
+            ///////////////////////////////////////
+            public void run() {
+                if (ident == null) {
+                    try {
+                        close();
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+               else {  if (mass!= null) {
+                    mass_1=null;
+                    try {
+                        mass_1 = serverProxy.listUsers(ident).toString();
+                    } catch (ArgumentFault argumentFault) {
+                        argumentFault.printStackTrace();
+                    } catch (ServerFault serverFault) {
+                        serverFault.printStackTrace();
+                    }
+                    if (!((mass).equals(mass_1))) {
+                        string = new String("update list of active users: " + mass_1);
+                        mass = mass_1;      }
+                    else{
+                      //  string = new String("list of active users with no update: " + mass_1);
+                    }
+                   } else {
+                    try {
+                        ////////////////////////////
+                        mass = (serverProxy.listUsers(ident)).toString();
+                    } catch (ArgumentFault argumentFault) {
+                        argumentFault.printStackTrace();
+                    } catch (ServerFault serverFault) {
+                        serverFault.printStackTrace();
+                    }
+                    string = new String("list of active users: " + mass);
+                }}
+            }
+        };
+        /////////////////////////////////
+        time1.schedule(timer,50);
+    }
+    ////////////////////////////////////
     public boolean regClient() {
         //try {
             //create object registry
@@ -209,8 +262,8 @@ public class ConnectionHendlerSoap implements  Runnable, Closeable{
         }
         */try{
             this.rgs= LocateRegistry.getRegistry(Host, Port);
-        this.serverWrapper = new ChatServer(url, qname);
-        this.serverProxy = serverWrapper.getChatServerProxy();
+            this.serverWrapper = new ChatServer(url, qname);
+            this.serverProxy = serverWrapper.getChatServerProxy();
        // this.serverProxy = (IChatServer) Service.create(url, qname);
         return true;}
         catch (IOException e){return false;}
@@ -228,11 +281,8 @@ public class ConnectionHendlerSoap implements  Runnable, Closeable{
                     if (ident != null) {
                     //server.exit(ident);
                     ident = null;
-          //      } //} catch (AccessException e) {
-                //e.printStackTrace();
-            //} catch (RemoteException e) {
-              //  e.printStackTrace();
-            }
+                    mass= null;
+                      }
         //}
     }}
 
