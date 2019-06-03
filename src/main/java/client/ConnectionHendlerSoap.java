@@ -61,13 +61,13 @@ public class ConnectionHendlerSoap implements  Runnable, Closeable{
         String uri = String.format("http://%s:%d/chat", "localhost", 8080);
 
        // ResourceConfig resourceConfig = new DefaultResourceConfig();
-        resourceConfig.getSingletons().add(this);
-        resourceConfig.getProperties().put("com.sun.jersey.spi.container.ContainerRequestFilters",
-                "lpi.server.rest.AuthorizationFilter");
+       // resourceConfig.getSingletons().add(this);
+        //resourceConfig.getProperties().put("com.sun.jersey.spi.container.ContainerRequestFilters",
+              //  "lpi.server.rest.AuthorizationFilter");
 
         try {
-            this.server = GrizzlyServerFactory.createHttpServer(URI.create(uri), resourceConfig);
-        } catch (IllegalArgumentException | NullPointerException | IOException e) {
+          //  this.server = GrizzlyServerFactory.createHttpServer(URI.create(uri), resourceConfig);
+        } catch (IllegalArgumentException | NullPointerException e) {
             throw new RuntimeException("Failed to start REST Server", e);
         }
         /*this.request = new Client() {
