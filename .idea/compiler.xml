@@ -7,9 +7,11 @@
         <sourceTestOutputDir name="target/generated-test-sources/test-annotations" />
         <outputRelativeToContentRoot value="true" />
         <module name="ClientAppLP" />
-        <module name="Clientcl" />
         <module name="ClientRMI" />
       </profile>
     </annotationProcessing>
+    <bytecodeTargetLevel>
+      <module name="clientRest" target="8" />
+    </bytecodeTargetLevel>
   </component>
 </project>

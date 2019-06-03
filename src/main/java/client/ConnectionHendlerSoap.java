@@ -1,62 +1,170 @@
 package client;
 
 import commands.TCP_commands;
-import lpi.server.rmi.IServer;
-import lpi.server.soap.*;
 import lpi.server.soap.Message;
-//import myApp.soapProxy.lpi.server.soap.*;
-//import myApp.soapProxy.lpi.server.soap.Ping;
-//import myApp.soapProxy.lpi.server.soap.Message;
+import lpi.server.soap.*;
+import org.glassfish.jersey.client.ClientConfig;
+import org.glassfish.jersey.client.ClientRequest;
+import org.glassfish.jersey.client.ClientResponse;
+import sun.net.www.http.HttpClient;
 
-import javax.jws.WebService;
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.SSLContext;
+import javax.ws.rs.client.*;
+import javax.ws.rs.core.Configuration;
+import javax.ws.rs.core.Link;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.UriBuilder;
+import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.namespace.QName;
+import javax.xml.ws.Response;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebServiceException;
-import java.io.Closeable;
-import java.io.File;
-import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
+import java.io.*;
+import java.net.*;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.nio.file.StandardOpenOption;
-import java.rmi.AccessException;
-import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 import java.rmi.registry.LocateRegistry;
 import java.rmi.registry.Registry;
-import java.util.List;
+import java.util.Map;
 import java.util.Timer;
 import java.util.TimerTask;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-//@WebService(serviceName = "ChatServer", portName = "ChatServerProxy", endpointInterface = "lpi.server.soap.IServer")
+
 
 public class ConnectionHendlerSoap implements  Runnable, Closeable{
-    private Registry rgs;
+     private Registry rgs;
+    //Client client = new Client();
     private IChatServer server;
     private int Port;
     private String Host;
    // private Ping ping1;
     //private Echo echo1;
+   private static final String REST_URI = "http://localhost:8082/spring-jersey/resources/employees";
+
     private ProtocolManager protocolManager = new ProtocolManager();
     ChatServer serverWrapper;
     IChatServer serverProxy;
-    URL url = new URL("http://localhost:4321/chat?wsdl");
-    QName qname = new QName("http://soap.server.lpi/", "ChatServer");
-    Service service;// = Service.create(url, qname);
 
+    private static URI getBaseURI() {
+        return UriBuilder.fromUri("http://localhost:8080/com.vogella.jersey.first").build();
+    }
+  Client config;// = new Client();
+    Client request;
+    //Client cl=new Client();
     public ConnectionHendlerSoap(String Host, int Port) throws MalformedURLException {
         this.Port = Port;
         this.Host = Host;
-        serverWrapper = new ChatServer( url, qname);
-       serverProxy = serverWrapper.getChatServerProxy();
-    }
+        String uri = String.format("http://%s:%d/chat", "localhost", 8080);
+
+       // ResourceConfig resourceConfig = new DefaultResourceConfig();
+        resourceConfig.getSingletons().add(this);
+        resourceConfig.getProperties().put("com.sun.jersey.spi.container.ContainerRequestFilters",
+                "lpi.server.rest.AuthorizationFilter");
+
+        try {
+            this.server = GrizzlyServerFactory.createHttpServer(URI.create(uri), resourceConfig);
+        } catch (IllegalArgumentException | NullPointerException | IOException e) {
+            throw new RuntimeException("Failed to start REST Server", e);
+        }
+        /*this.request = new Client() {
+            @Override
+            public Configuration getConfiguration() {
+                return null;
+            }
+
+            @Override
+            public Client property(String s, Object o) {
+                return null;
+            }
+
+            @Override
+            public Client register(Class<?> aClass) {
+                return null;
+            }
+
+            @Override
+            public Client register(Class<?> aClass, int i) {
+                return null;
+            }
+
+            @Override
+            public Client register(Class<?> aClass, Class<?>... classes) {
+                return null;
+            }
+
+            @Override
+            public Client register(Class<?> aClass, Map<Class<?>, Integer> map) {
+                return null;
+            }
+
+            @Override
+            public Client register(Object o) {
+                return null;
+            }
+
+            @Override
+            public Client register(Object o, int i) {
+                return null;
+            }
+
+            @Override
+            public Client register(Object o, Class<?>... classes) {
+                return null;
+            }
+
+            @Override
+            public Client register(Object o, Map<Class<?>, Integer> map) {
+                return null;
+            }
+
+            @Override
+            public void close() {
+
+            }
+
+            @Override
+            public WebTarget target(String s) {
+                return null;
+            }
+
+            @Override
+            public WebTarget target(URI uri) {
+                return null;
+            }
+
+            @Override
+            public WebTarget target(UriBuilder uriBuilder) {
+                return null;
+            }
+
+            @Override
+            public WebTarget target(Link link) {
+                return null;
+            }
+
+            @Override
+            public Invocation.Builder invocation(Link link) {
+                return null;
+            }
+
+            @Override
+            public SSLContext getSslContext() {
+                return null;
+            }
+
+            @Override
+            public HostnameVerifier getHostnameVerifier() {
+                return null;
+            }
+        };*/
+     }
     /////////////////////////
     IChatServer hello;// = service.getPort(IChatServer.class);
 
-   /// hello=service(IChatServer.class);
     public void perform(String text_from_client) throws IOException {
         CommPars_1(protocolManager.TextPars(text_from_client));
     }
@@ -247,27 +355,20 @@ public class ConnectionHendlerSoap implements  Runnable, Closeable{
     }
     ////////////////////////////////////
     public boolean regClient() {
-        //try {
-            //create object registry
-           // this.rgs= LocateRegistry.getRegistry(Host, Port);
-            ///get object
-            //this.server = (IChatServer) rgs.lookup("lpi.server.rmi");
-        /*
         try {
-            //create object registry
-            this.rgs= LocateRegistry.getRegistry(Host, Port);
-            ///get object
-            this.server = (IServer) rgs.lookup("lpi.server.rmi");
-            return true;
-        }
-        */try{
-            this.rgs= LocateRegistry.getRegistry(Host, Port);
-            this.serverWrapper = new ChatServer(url, qname);
-            this.serverProxy = serverWrapper.getChatServerProxy();
-       // this.serverProxy = (IChatServer) Service.create(url, qname);
-        return true;}
-        catch (IOException e){return false;}
 
+           // Client request = new Client("http://localhost:8080/RESTfulExample/json/product/get");
+            //request.accept("application/json");
+            //ClientResponse<String> response = request.get(String.class);
+
+
+
+        } catch (ClassCastException e) {
+
+            e.printStackTrace();
+
+        }
+        return true;
     }
     //////////////////////////
 
@@ -315,3 +416,4 @@ public class ConnectionHendlerSoap implements  Runnable, Closeable{
 
 
 }
+

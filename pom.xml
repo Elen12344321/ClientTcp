@@ -6,6 +6,7 @@
 
     <groupId>Clientcl</groupId>
     <artifactId>Clientcl</artifactId>
+    <packaging>pom</packaging>
     <version>1.0-SNAPSHOT</version>
     <build>
         <plugins>
@@ -20,13 +21,22 @@
             </plugin>
         </plugins>
     </build>
+
     <dependencies>
         <dependency>
-            <groupId>ClientTCP1</groupId>
-            <artifactId>ClientTCP1</artifactId>
-            <version>1.0-SNAPSHOT</version>
+            <groupId>org.glassfish.jersey.core</groupId>
+            <artifactId>jersey-client</artifactId>
+            <version>2.22.2</version>
+        </dependency>
+        <dependency>
+            <groupId>org.glassfish.jersey.media</groupId>
+            <artifactId>jersey-media-moxy</artifactId>
+            <version>2.22.2</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sun.jersey</groupId>
+            <artifactId>jersey-json</artifactId>
+            <version>1.19.1</version>
         </dependency>
     </dependencies>
-
-
 </project>

@@ -1,5 +1,6 @@
 package client;
 
+import javax.xml.ws.Response;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.io.IOException;
@@ -14,7 +15,7 @@ public class SoapClient extends javax.swing.JFrame {
 
 
     private Thread thread;
-
+    public static final int HTTP_CREATED = 201;
     private ConnectionHendlerSoap ConnSoap;
     private ProtocolManager protocolmanager = new ProtocolManager();
 
@@ -22,7 +23,14 @@ public class SoapClient extends javax.swing.JFrame {
         //title
         super("ClientSoap");
         initComponents();
-        ConnSoap = new ConnectionHendlerSoap("localhost", 4321);
+        //////////////
+       // Employee emp = new Employee(6, "Johny");
+
+       // Response response = ConnSoap.createJsonEmployee();
+
+        //assertEquals(response.getStatus(), HTTP_CREATED);
+        ///////////////////////
+        ConnSoap = new ConnectionHendlerSoap("localhost", 8080);
         //connect button
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("hh:mm  ");
 //////////////////////////////////////////////////////////////////////////////////////////////////////////
