@@ -2,14 +2,12 @@ package commands;
 
 public enum TCP_commands {
     CMD_PING("^%(ping):?"),
-    CMD_ECHO("^%(echo):?"),
-    CMD_LOGIN("^%(log)?:((log)(-)(.)+)(\\s)((pass)+(-)+(.)+)+;"),
+    CMD_ECHO("^%(echo):?\\s(.)+;"),
+    CMD_LOGIN("^%(log):?\\s((l)(-)(.)+)\\s((p)(-)(.)+)+;"),
     CMD_LIST("^%list:?"),
-    CMD_MSG("^%(msg):?\\s((log)(-)(.)+)\\s((m)(-)(.)+)+;"),
-    CMD_RECIVE_MSG("^%(rec):?"),
-    CMD_FILE("^%(file):?\\s((l)(-)(.)+)(\\s)(f)(-)(.)+;"),
-    CMD_RECIVE_FILE("^%(fileres):?"),
-    EXIT("^%(ex):?");
+    CMD_MSG("^%msg:?\\s((l)(-)(.)+)\\s((t)(-)(.)+)+;"),
+    CMD_FILE("^%(file):?\\s((log)(-)(.)+)\\s((f)(-)(.)+)+;"),
+    CMD_EXIT("^%(ex):?");
 
 
     private final String reg;
