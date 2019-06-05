@@ -1,2 +1,2 @@
-# ClientTcp
-TcpClientAppliation
+# Client Application
+ClientAppliation
